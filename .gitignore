@@ -1,0 +1,5 @@
+.idea
+.vscode
+logs
+configs/config.local.json
+.env.local
