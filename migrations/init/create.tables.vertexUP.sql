@@ -10,7 +10,7 @@ CREATE TABLE "User"(
 
 CREATE TABLE "Status"(
     id serial PRIMARY KEY ,
-    name varchar
+    name varchar UNIQUE
 ) WITHOUT OIDS ;
 
 

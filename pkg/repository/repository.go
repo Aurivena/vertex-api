@@ -15,14 +15,22 @@ type Auth interface {
 	SignOut()
 }
 
+type Account interface {
+	GetUserByEmail(email string) (*models.Account, error)
+	GetUserByLogin(login string) (*models.Account, error)
+	IsRegistered(input string) (bool, error)
+}
+
 type Repository struct {
 	Sources *Sources
 	Auth
+	Account
 }
 
 func NewRepository(sources *Sources) *Repository {
 	return &Repository{
 		Sources: sources,
 		Auth:    NewAuthPostgres(sources.BusinessDB),
+		Account: NewAccountPostgres(sources.BusinessDB),
 	}
 }

@@ -23,3 +23,19 @@ func (h Handler) signUp(c *gin.Context) {
 
 	c.JSON(http.StatusOK, output)
 }
+
+func (h Handler) signIn(c *gin.Context) {
+	var input *models.SignInInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	output, processStatus := h.usecase.SignIn(input)
+	if processStatus != utils.Success {
+		c.JSON(http.StatusBadRequest, processStatus)
+		return
+	}
+
+	c.JSON(http.StatusOK, output)
+}

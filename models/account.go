@@ -5,20 +5,27 @@ import "time"
 type Account struct {
 	Name             string    `json:"name"`
 	Login            string    `json:"login"`
-	Password         string    `json:"password"`
+	Password         string    `json:"-"`
 	Email            string    `json:"email"`
 	Status           string    `json:"status"`
-	DateRegistration time.Time `json:"date_registration"`
+	DateRegistration time.Time `json:"date_registration" db:"date_registration"`
+}
+
+type SignOutput struct {
+	Name             string    `json:"name" db:"name"`
+	Login            string    `json:"login" db:"login"`
+	Email            string    `json:"email" db:"email"`
+	Status           string    `json:"status" db:"status"`
+	DateRegistration time.Time `json:"date_registration" db:"date_registration"`
 }
 
 type SignInInput struct {
-	Login    string `json:"login"`
+	Input    string `json:"input"`
 	Password string `json:"password"`
-	Email    string `json:"email"`
 }
 
 type SignInOutput struct {
-	Account
+	SignOutput
 }
 
 type SignUpInput struct {
@@ -29,9 +36,5 @@ type SignUpInput struct {
 }
 
 type SignUpOutput struct {
-	Name             string    `json:"name"`
-	Login            string    `json:"login"`
-	Email            string    `json:"email"`
-	Status           string    `json:"status"`
-	DateRegistration time.Time `json:"date_registration"`
+	SignOutput
 }

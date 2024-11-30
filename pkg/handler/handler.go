@@ -41,6 +41,7 @@ func (h *Handler) InitHTTPRoutes(env *models.Environment) *gin.Engine {
 	auth := router.Group("api/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
+		auth.POST("/sign-in", h.signIn)
 	}
 
 	return router

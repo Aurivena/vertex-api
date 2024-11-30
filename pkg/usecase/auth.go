@@ -6,10 +6,35 @@ import (
 )
 
 func (u Usecase) SignUp(input *models.SignUpInput) (*models.SignUpOutput, utils.ErrorCode) {
-	output, err := u.services.SignUp(input)
+	isRegistered, err := u.services.IsRegistered(input.Login)
 	if err != nil {
-		return nil, utils.BadRequest
+		return nil, utils.InternalServerError
 	}
 
-	return output, utils.Success
+	if !isRegistered {
+		output, err := u.services.SignUp(input)
+		if err != nil {
+			return nil, utils.BadRequest
+		}
+		return output, utils.Success
+	}
+	return nil, utils.BadRequest
+}
+
+func (u Usecase) SignIn(input *models.SignInInput) (*models.SignInOutput, utils.ErrorCode) {
+	isRegistered, err := u.services.IsRegistered(input.Input)
+	if err != nil {
+		return nil, utils.InternalServerError
+	}
+
+	if isRegistered {
+		output, err := u.services.SignIn(input)
+		if err != nil {
+			return nil, utils.InternalServerError
+		}
+
+		return output, utils.Success
+	}
+
+	return nil, utils.InternalServerError
 }
