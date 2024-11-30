@@ -5,9 +5,18 @@ import (
 	"vertexUP/pkg/repository"
 )
 
-type Service struct {
+type Auth interface {
+	SignIn()
+	SignUp()
+	SignOut()
 }
 
-func NewService(repo *repository.Repository, cfg *models.Config, env *models.Environment) *Service {
-	return &Service{}
+type Service struct {
+	Auth
+}
+
+func NewService(repos *repository.Repository, cfg *models.Config, env *models.Environment) *Service {
+	return &Service{
+		Auth: NewAuthService(repos.Auth),
+	}
 }
