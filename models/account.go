@@ -1,11 +1,14 @@
 package models
 
+import "time"
+
 type Account struct {
-	Name     string `json:"name"`
-	Login    string `json:"login"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Status   string `json:"status"`
+	Name             string    `json:"name"`
+	Login            string    `json:"login"`
+	Password         string    `json:"password"`
+	Email            string    `json:"email"`
+	Status           string    `json:"status"`
+	DateRegistration time.Time `json:"date_registration"`
 }
 
 type SignInInput struct {
@@ -15,11 +18,7 @@ type SignInInput struct {
 }
 
 type SignInOutput struct {
-	Name     string `json:"name"`
-	Login    string `json:"login"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Status   string `json:"status"`
+	Account
 }
 
 type SignUpInput struct {
@@ -30,9 +29,9 @@ type SignUpInput struct {
 }
 
 type SignUpOutput struct {
-	Name     string `json:"name"`
-	Login    string `json:"login"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Status   string `json:"status"`
+	Name             string    `json:"name"`
+	Login            string    `json:"login"`
+	Email            string    `json:"email"`
+	Status           string    `json:"status"`
+	DateRegistration time.Time `json:"date_registration"`
 }

@@ -6,8 +6,8 @@ import (
 )
 
 type Auth interface {
-	SignIn()
-	SignUp()
+	SignIn(input *models.SignInInput) (*models.SignInOutput, error)
+	SignUp(input *models.SignUpInput) (*models.SignUpOutput, error)
 	SignOut()
 }
 

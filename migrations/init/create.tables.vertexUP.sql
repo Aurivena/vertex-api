@@ -4,6 +4,7 @@ CREATE TABLE "User"(
     email varchar UNIQUE ,
     password varchar,
     status int,
+    date_registration timestamp,
     PRIMARY KEY (login)
 ) WITHOUT OIDS ;
 

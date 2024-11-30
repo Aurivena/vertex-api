@@ -1,14 +1,17 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"vertexUP/models"
+)
 
 type Sources struct {
 	BusinessDB *sqlx.DB
 }
 
 type Auth interface {
-	SignIn()
-	SignUp()
+	SignIn(input *models.SignInInput) (*models.SignInOutput, error)
+	SignUp(input *models.SignUpInput) (*models.SignUpOutput, error)
 	SignOut()
 }
 
