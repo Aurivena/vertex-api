@@ -3,7 +3,6 @@ package repository
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
-	"time"
 	"vertexUP/models"
 )
 
@@ -40,21 +39,4 @@ func (r TokenRepository) RevokeToken(token string) error {
 	}
 
 	return nil
-}
-
-func (r TokenRepository) IsTokenActive(token string) (bool, error) {
-	var isRevoked bool
-	var expertion time.Time
-
-	query := `SELECT is_revoked, token_expiration 
-		FROM "Token" 
-		WHERE token = $1`
-
-	err := r.db.QueryRow(query, token).Scan(&isRevoked, &expertion)
-	if err != nil {
-		logrus.Errorf("ошибка проверки токена: %v", err)
-		return false, err
-	}
-
-	return !isRevoked && expertion.After(time.Now()), nil
 }

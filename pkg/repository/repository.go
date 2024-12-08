@@ -12,7 +12,6 @@ type Sources struct {
 type Auth interface {
 	SignIn(input *models.SignInInput) (*models.SignInOutput, error)
 	SignUp(input *models.SignUpInput) (*models.SignUpOutput, error)
-	SignOut()
 }
 
 type Account interface {
@@ -22,8 +21,11 @@ type Account interface {
 }
 
 type Token interface {
-	SaveToken(login, string, token models.Token) error
+	SaveToken(login string, token models.Token) error
 	RevokeToken(token string) error
+}
+
+type Middleware interface {
 	IsTokenActive(token string) (bool, error)
 }
 
@@ -32,13 +34,15 @@ type Repository struct {
 	Auth
 	Account
 	Token
+	Middleware
 }
 
 func NewRepository(sources *Sources) *Repository {
 	return &Repository{
-		Sources: sources,
-		Auth:    NewAuthPostgres(sources.BusinessDB),
-		Account: NewAccountPostgres(sources.BusinessDB),
-		Token:   NewTokenRepository(sources.BusinessDB),
+		Sources:    sources,
+		Auth:       NewAuthPostgres(sources.BusinessDB),
+		Account:    NewAccountPostgres(sources.BusinessDB),
+		Token:      NewTokenRepository(sources.BusinessDB),
+		Middleware: NewMiddlewareRepository(sources.BusinessDB),
 	}
 }

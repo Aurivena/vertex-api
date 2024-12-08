@@ -19,7 +19,7 @@ CREATE TABLE "Token" (
     token TEXT NOT NULL UNIQUE,
     token_expiration timestamp,
     refresh_token_expiration timestamp,
-    IsRevoked bool default false
+    is_revoked bool default false
 ) WITHOUT OIDS ;
 
 ALTER TABLE "User"

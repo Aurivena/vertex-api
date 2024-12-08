@@ -53,7 +53,3 @@ func (r *AuthPostgres) SignUp(input *models.SignUpInput) (*models.SignUpOutput, 
 
 	return &output, nil
 }
-
-func (r *AuthPostgres) SignOut() {
-
-}

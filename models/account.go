@@ -16,7 +16,6 @@ type SignOutput struct {
 	Name             string    `json:"name" db:"name"`
 	Login            string    `json:"login" db:"login"`
 	Token            Token     `json:"token" db:"token"`
-	AccessToken      string    `json:"access_token" db:"access_token"`
 	Email            string    `json:"email" db:"email"`
 	Status           string    `json:"status" db:"status"`
 	DateRegistration time.Time `json:"date_registration" db:"date_registration"`

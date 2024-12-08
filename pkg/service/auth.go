@@ -64,10 +64,6 @@ func (s AuthService) SignUp(input *models.SignUpInput) (*models.SignUpOutput, er
 	return s.repo.SignUp(input)
 }
 
-func (s AuthService) SignOut() {
-
-}
-
 func validateName(name string) error {
 	if name == "" {
 		logrus.Error("name is nil")

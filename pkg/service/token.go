@@ -8,11 +8,11 @@ import (
 )
 
 type TokenService struct {
-	repo   repository.Repository
+	repo   repository.Token
 	secret string
 }
 
-func NewTokenService(repo repository.Repository, secret string) *TokenService {
+func NewTokenService(repo repository.Token, secret string) *TokenService {
 	return &TokenService{repo: repo, secret: secret}
 }
 
@@ -53,4 +53,12 @@ func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) 
 	}
 
 	return token, nil
+}
+
+func (s TokenService) Logout(login string) error {
+	err := s.repo.RevokeToken(login)
+	if err != nil {
+		return err
+	}
+	return nil
 }
