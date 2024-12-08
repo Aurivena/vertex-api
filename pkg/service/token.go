@@ -8,6 +8,10 @@ import (
 	"vertexUP/pkg/repository"
 )
 
+var (
+	now = time.Now()
+)
+
 type TokenService struct {
 	repo   repository.Token
 	secret string
@@ -18,8 +22,6 @@ func NewTokenService(repo repository.Token, secret string) *TokenService {
 }
 
 func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) {
-
-	now := time.Now()
 
 	accessTokenClaims := jwt.MapClaims{
 		"login": login,
@@ -70,4 +72,22 @@ func (s TokenService) Logout(token string) error {
 		return err
 	}
 	return nil
+}
+
+func (s TokenService) RefreshToken(refreshToken string, login string) (string, error) {
+	newAccessToken, err := CreateJWTToken(login, s.secret, 15*time.Minute)
+	if err != nil {
+		return "", err
+	}
+
+	return s.repo.UpdateAccessToken(refreshToken, newAccessToken)
+}
+
+func CreateJWTToken(login, secret string, expiration time.Duration) (string, error) {
+	claims := jwt.MapClaims{
+		"login": login,
+		"exp":   time.Now().Add(expiration).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(secret))
 }

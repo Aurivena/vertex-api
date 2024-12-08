@@ -5,7 +5,6 @@ import "time"
 type Account struct {
 	Name             string    `json:"name"`
 	Login            string    `json:"login"`
-	Token            Token     `json:"token"`
 	Password         string    `json:"-"`
 	Email            string    `json:"email"`
 	Status           string    `json:"status"`

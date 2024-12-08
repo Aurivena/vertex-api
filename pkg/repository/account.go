@@ -38,6 +38,20 @@ func (r AccountPostgres) GetUserByLogin(login string) (*models.Account, error) {
 	return &output, nil
 }
 
+func (r AccountPostgres) GetUserByRefreshToken(refreshToken string) (*models.Account, error) {
+	output := models.Account{}
+
+	err := r.db.Get(&output, `SELECT * FROM "User"
+									INNER JOIN "Token" on "Token".login = "User".login
+									WHERE "Token".refresh_token = $1`, refreshToken)
+	if err != nil {
+		logrus.Error(err.Error())
+		return nil, err
+	}
+
+	return &output, nil
+}
+
 func (r AccountPostgres) IsRegistered(input string) (bool, error) {
 	var exists bool
 	err := r.db.Get(&exists,

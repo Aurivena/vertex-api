@@ -24,3 +24,7 @@ func (s AccountService) GetUserByEmail(email string) (*models.Account, error) {
 func (s AccountService) GetUserByLogin(login string) (*models.Account, error) {
 	return s.repo.GetUserByLogin(login)
 }
+
+func (s AccountService) GetUserByRefreshToken(refreshToken string) (*models.Account, error) {
+	return s.repo.GetUserByRefreshToken(refreshToken)
+}

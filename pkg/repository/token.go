@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"time"
 	"vertexUP/models"
 )
 
@@ -27,6 +28,18 @@ func (r TokenRepository) SaveToken(login string, token models.Token) error {
 	}
 
 	return nil
+}
+
+func (r TokenRepository) UpdateAccessToken(refreshToken string, newAccessToken string) (string, error) {
+	query := `UPDATE "Token" SET "access_token"=$1, token_expiration = $2  WHERE "refresh_token"=$3`
+
+	_, err := r.db.Exec(query, newAccessToken, time.Now().Add(15*time.Minute), refreshToken)
+	if err != nil {
+		logrus.Error("ошибка в обновлении токена: %w", err)
+		return "", err
+	}
+
+	return newAccessToken, nil
 }
 
 func (r TokenRepository) RevokeToken(token string) error {

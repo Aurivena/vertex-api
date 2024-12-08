@@ -14,11 +14,13 @@ type Account interface {
 	GetUserByEmail(email string) (*models.Account, error)
 	GetUserByLogin(login string) (*models.Account, error)
 	IsRegistered(input string) (bool, error)
+	GetUserByRefreshToken(refreshToken string) (*models.Account, error)
 }
 
 type Token interface {
 	GenerateTokenAndSave(login string) (*models.Token, error)
 	Logout(token string) error
+	RefreshToken(refreshToken string, login string) (string, error)
 }
 
 type Middleware interface {
