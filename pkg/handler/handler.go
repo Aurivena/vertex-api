@@ -44,6 +44,12 @@ func (h *Handler) InitHTTPRoutes(env *models.Environment) *gin.Engine {
 		auth.POST("/sign-in", h.signIn)
 	}
 
+	protected := router.Group("api")
+	protected.Use(h.TokenValidationMiddleware)
+	{
+		protected.POST("/logout", h.logout)
+	}
+
 	return router
 }
 

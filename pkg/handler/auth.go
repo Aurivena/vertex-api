@@ -21,6 +21,14 @@ func (h Handler) signUp(c *gin.Context) {
 		return
 	}
 
+	token, processStatus := h.usecase.SetToken(output.Login)
+	if processStatus != utils.Success {
+		c.JSON(http.StatusBadRequest, processStatus)
+		return
+	}
+
+	c.Header("Authorization", token)
+
 	c.JSON(http.StatusOK, output)
 }
 
@@ -37,5 +45,29 @@ func (h Handler) signIn(c *gin.Context) {
 		return
 	}
 
+	token, processStatus := h.usecase.SetToken(output.Login)
+	if processStatus != utils.Success {
+		c.JSON(http.StatusBadRequest, processStatus)
+		return
+	}
+
+	c.Header("Authorization", token)
+
 	c.JSON(http.StatusOK, output)
+}
+
+func (h Handler) logout(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "токен отсутствует"})
+		return
+	}
+
+	processStatus := h.usecase.Logout(token)
+	if processStatus != utils.Success {
+		c.JSON(http.StatusUnauthorized, processStatus)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }

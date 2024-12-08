@@ -17,17 +17,6 @@ func (u Usecase) SignUp(input *models.SignUpInput) (*models.SignUpOutput, utils.
 			return nil, utils.BadRequest
 		}
 
-		token, err := u.services.GenerateTokenAndSave(output.Login)
-		if err != nil {
-			return nil, utils.InternalServerError
-		}
-		output.Token = models.Token{
-			AccessToken:           token.AccessToken,
-			RefreshToken:          token.RefreshToken,
-			AccessTokenExpiresAt:  token.AccessTokenExpiresAt,
-			RefreshTokenExpiresAt: token.RefreshTokenExpiresAt,
-		}
-
 		return output, utils.Success
 	}
 	return nil, utils.BadRequest
@@ -45,19 +34,17 @@ func (u Usecase) SignIn(input *models.SignInInput) (*models.SignInOutput, utils.
 			return nil, utils.InternalServerError
 		}
 
-		token, err := u.services.GenerateTokenAndSave(output.Login)
-		if err != nil {
-			return nil, utils.InternalServerError
-		}
-		output.Token = models.Token{
-			AccessToken:           token.AccessToken,
-			RefreshToken:          token.RefreshToken,
-			AccessTokenExpiresAt:  token.AccessTokenExpiresAt,
-			RefreshTokenExpiresAt: token.RefreshTokenExpiresAt,
-		}
-
 		return output, utils.Success
 	}
 
 	return nil, utils.UnregisteredAccount
+}
+
+func (u Usecase) Logout(token string) utils.ErrorCode {
+	err := u.services.Logout(token)
+	if err != nil {
+		return utils.InternalServerError
+	}
+
+	return utils.Success
 }

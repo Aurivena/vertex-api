@@ -21,6 +21,8 @@ func (h Handler) TokenValidationMiddleware(c *gin.Context) {
 		return
 	}
 
+	c.Request.Header.Set("Authorization", "Bearer "+token)
+
 	if !isActive {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "токен недействителен"})
 		c.Abort()
