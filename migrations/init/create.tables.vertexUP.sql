@@ -13,6 +13,17 @@ CREATE TABLE "Status"(
     name varchar UNIQUE
 ) WITHOUT OIDS ;
 
+CREATE TABLE "Token" (
+    id serial PRIMARY KEY ,
+    login varchar,
+    token TEXT NOT NULL UNIQUE,
+    token_expiration timestamp,
+    refresh_token_expiration timestamp,
+    IsRevoked bool default false
+) WITHOUT OIDS ;
 
 ALTER TABLE "User"
-    ADD CONSTRAINT "fk_User_0" FOREIGN KEY ("status") REFERENCES "Status" ("id")
+    ADD CONSTRAINT "fk_User_0" FOREIGN KEY ("status") REFERENCES "Status" ("id");
+
+ALTER TABLE "Token"
+    ADD CONSTRAINT "fk_Token_0" FOREIGN KEY ("login")  REFERENCES "User" ("login") ON DELETE CASCADE

@@ -21,10 +21,17 @@ type Account interface {
 	IsRegistered(input string) (bool, error)
 }
 
+type Token interface {
+	SaveToken(login, string, token models.Token) error
+	RevokeToken(token string) error
+	IsTokenActive(token string) (bool, error)
+}
+
 type Repository struct {
 	Sources *Sources
 	Auth
 	Account
+	Token
 }
 
 func NewRepository(sources *Sources) *Repository {
@@ -32,5 +39,6 @@ func NewRepository(sources *Sources) *Repository {
 		Sources: sources,
 		Auth:    NewAuthPostgres(sources.BusinessDB),
 		Account: NewAccountPostgres(sources.BusinessDB),
+		Token:   NewTokenRepository(sources.BusinessDB),
 	}
 }

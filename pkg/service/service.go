@@ -17,14 +17,20 @@ type Account interface {
 	IsRegistered(input string) (bool, error)
 }
 
+type Token interface {
+	GenerateTokenAndSave(login string) (*models.Token, error)
+}
+
 type Service struct {
 	Auth
 	Account
+	Token
 }
 
 func NewService(repos *repository.Repository, cfg *models.Config, env *models.Environment) *Service {
 	return &Service{
 		Auth:    NewAuthService(repos.Auth, NewAccountService(repos.Account)),
 		Account: NewAccountService(repos.Account),
+		Token:   NewTokenService(repos.Token, cfg.Secret),
 	}
 }

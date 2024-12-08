@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	"vertexUP/models"
 )
 
@@ -18,6 +19,7 @@ func (r AccountPostgres) GetUserByEmail(email string) (*models.Account, error) {
 
 	err := r.db.Get(&output, `SELECT * FROM "User" WHERE email = $1`, email)
 	if err != nil {
+		logrus.Error(err.Error())
 		return nil, err
 	}
 
@@ -29,6 +31,7 @@ func (r AccountPostgres) GetUserByLogin(login string) (*models.Account, error) {
 
 	err := r.db.Get(&output, `SELECT * FROM "User" WHERE login = $1 `, login)
 	if err != nil {
+		logrus.Error(err.Error())
 		return nil, err
 	}
 
@@ -43,6 +46,7 @@ func (r AccountPostgres) IsRegistered(input string) (bool, error) {
                  FROM "User" 
             	WHERE "login" = $1 OR "email" = $1) `, input)
 	if err != nil {
+		logrus.Error(err.Error())
 		return false, nil
 	}
 	return exists, nil

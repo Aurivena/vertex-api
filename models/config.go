@@ -12,7 +12,12 @@ type BusinessDBConfig struct {
 	SslMode  string `json:"ssl_mode"`
 }
 
+type Jwt struct {
+	Secret string `json:"secret"`
+}
+
 type Config struct {
 	Server   ServerConfig     `json:"server"`
 	Database BusinessDBConfig `json:"business-database"`
+	Secret   Jwt              `json:"jwt"`
 }
