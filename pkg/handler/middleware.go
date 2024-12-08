@@ -9,7 +9,6 @@ import (
 
 func (h Handler) TokenValidationMiddleware(c *gin.Context) {
 	token := c.GetHeader("Authorization")
-
 	token = strings.TrimPrefix(token, "Bearer ")
 
 	if token == "" {
@@ -19,10 +18,12 @@ func (h Handler) TokenValidationMiddleware(c *gin.Context) {
 	}
 
 	isActive, err := h.usecase.IsTokenActive(token)
-	if err != utils.Success {
+	if err != utils.Success || !isActive {
 		refreshToken := c.GetHeader("Refresh-Token")
+
 		if refreshToken == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Требуется авторизация"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh-Token отсутствует"})
+			c.Abort()
 			return
 		}
 
@@ -32,21 +33,14 @@ func (h Handler) TokenValidationMiddleware(c *gin.Context) {
 			return
 		}
 
-		tokenNew, processStatus := h.usecase.RefreshToken(refreshToken, outputUser.Login)
+		tokenNew, processStatus := h.usecase.UpdateAccessToken(refreshToken, outputUser.Login)
 		if processStatus != utils.Success {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": processStatus})
 			return
 		}
-
 		c.Request.Header.Set("Authorization", tokenNew)
 	} else {
 		c.Request.Header.Set("Authorization", token)
-	}
-
-	if !isActive {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "токен недействителен"})
-		c.Abort()
-		return
 	}
 
 	c.Next()

@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
+	"time"
 	"vertexUP/clerr"
 	"vertexUP/models"
 	"vertexUP/pkg/repository"
@@ -61,7 +62,7 @@ func (s AuthService) SignUp(input *models.SignUpInput) (*models.SignUpOutput, er
 
 	input.Password = bcryptHash(input.Password)
 
-	return s.repo.SignUp(input)
+	return s.repo.SignUp(input, time.Now().UTC())
 }
 
 func validateName(name string) error {

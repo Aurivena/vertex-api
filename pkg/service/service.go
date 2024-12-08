@@ -20,7 +20,8 @@ type Account interface {
 type Token interface {
 	GenerateTokenAndSave(login string) (*models.Token, error)
 	Logout(token string) error
-	RefreshToken(refreshToken string, login string) (string, error)
+	UpdateAccessToken(refreshToken string, login string) (string, error)
+	RefreshAllToken(login string) (*models.Token, error)
 }
 
 type Middleware interface {
