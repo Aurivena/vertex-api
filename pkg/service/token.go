@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 	"vertexUP/models"
@@ -17,6 +18,7 @@ func NewTokenService(repo repository.Token, secret string) *TokenService {
 }
 
 func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) {
+
 	now := time.Now()
 
 	accessTokenClaims := jwt.MapClaims{
@@ -47,6 +49,13 @@ func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) 
 		RefreshTokenExpiresAt: now.Add(7 * 24 * time.Hour),
 	}
 
+	count := s.repo.CheckCount(login)
+	if count > 5 {
+		s.repo.RevokeToken(accessTokenString)
+		return nil, fmt.Errorf("ошибка. токенов больше 5")
+
+	}
+
 	err = s.repo.SaveToken(login, *token)
 	if err != nil {
 		return nil, err
@@ -55,8 +64,8 @@ func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) 
 	return token, nil
 }
 
-func (s TokenService) Logout(login string) error {
-	err := s.repo.RevokeToken(login)
+func (s TokenService) Logout(token string) error {
+	err := s.repo.RevokeToken(token)
 	if err != nil {
 		return err
 	}

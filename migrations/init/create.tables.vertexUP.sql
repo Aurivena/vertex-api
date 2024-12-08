@@ -16,7 +16,8 @@ CREATE TABLE "Status"(
 CREATE TABLE "Token" (
     id serial PRIMARY KEY ,
     login varchar,
-    token TEXT NOT NULL UNIQUE,
+    access_token TEXT NOT NULL UNIQUE,
+    refresh_token TEXT NOT NULL UNIQUE,
     token_expiration timestamp,
     refresh_token_expiration timestamp,
     is_revoked bool default false

@@ -3,7 +3,6 @@ package repository
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
-	"strings"
 	"time"
 )
 
@@ -21,9 +20,7 @@ func (r MiddlewareRepository) IsTokenActive(token string) (bool, error) {
 
 	query := `SELECT is_revoked, token_expiration 
 		FROM "Token" 
-		WHERE token = $1`
-
-	token = strings.TrimPrefix(token, "Bearer ")
+		WHERE access_token = $1`
 
 	err := r.db.QueryRow(query, token).Scan(&isRevoked, &expertion)
 	if err != nil {

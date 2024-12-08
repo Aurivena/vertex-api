@@ -18,7 +18,7 @@ type Account interface {
 
 type Token interface {
 	GenerateTokenAndSave(login string) (*models.Token, error)
-	Logout(login string) error
+	Logout(token string) error
 }
 
 type Middleware interface {

@@ -23,6 +23,7 @@ type Account interface {
 type Token interface {
 	SaveToken(login string, token models.Token) error
 	RevokeToken(token string) error
+	CheckCount(login string) int
 }
 
 type Middleware interface {
