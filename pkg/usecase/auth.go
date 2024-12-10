@@ -46,5 +46,5 @@ func (u Usecase) Logout(token string) utils.ErrorCode {
 		return utils.InternalServerError
 	}
 
-	return utils.Success
+	return utils.NoContent
 }
