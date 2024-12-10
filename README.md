@@ -41,3 +41,10 @@ IS_VERIFY_DEPENDENCIES=true
 }
 
 ```
+
+# Быстрый старт
+- Создаем .env
+- Создаем config.local.json
+- запускаем ./goose_init.sh
+- запускаем ./swagger_init_and_start.sh
+- запускаем main
