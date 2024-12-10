@@ -22,7 +22,7 @@ func (h Handler) TokenValidationMiddleware(c *gin.Context) {
 		refreshToken := c.GetHeader("Refresh-Token")
 
 		if refreshToken == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh-Token отсутствует"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Требуется авторизация"})
 			c.Abort()
 			return
 		}
