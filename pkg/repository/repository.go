@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
+	"time"
 	"vertexUP/models"
 )
 
@@ -11,7 +12,7 @@ type Sources struct {
 
 type Auth interface {
 	SignIn(input *models.SignInInput) (*models.SignInOutput, error)
-	SignUp(input *models.SignUpInput) (*models.SignUpOutput, error)
+	SignUp(input *models.SignUpInput, time time.Time) (*models.SignUpOutput, error)
 }
 
 type Account interface {
@@ -25,7 +26,9 @@ type Token interface {
 	SaveToken(login string, token models.Token) error
 	RevokeToken(token string) error
 	CheckCount(login string) int
-	UpdateAccessToken(refreshToken string, newAccessToken string) (string, error)
+	UpdateAccessToken(refreshToken string, newAccessToken string, time time.Time) (string, error)
+	RefreshAllTokens(login, newAccessToken, newRefreshToken string, newAccessTokenExpiry, newRefreshTokenExpiry time.Time) error
+	GetTimeToken(login string) (*models.Token, error)
 }
 
 type Middleware interface {

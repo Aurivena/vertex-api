@@ -13,8 +13,8 @@ func (u Usecase) SetToken(login string) (string, utils.ErrorCode) {
 	return token.AccessToken, utils.Success
 }
 
-func (u Usecase) RefreshToken(refreshToken string, login string) (string, utils.ErrorCode) {
-	token, err := u.services.RefreshToken(refreshToken, login)
+func (u Usecase) UpdateAccessToken(refreshToken string, login string) (string, utils.ErrorCode) {
+	token, err := u.services.UpdateAccessToken(refreshToken, login)
 	if err != nil {
 		return "", utils.BadRequest
 	}

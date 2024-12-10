@@ -30,10 +30,10 @@ func (r TokenRepository) SaveToken(login string, token models.Token) error {
 	return nil
 }
 
-func (r TokenRepository) UpdateAccessToken(refreshToken string, newAccessToken string) (string, error) {
+func (r TokenRepository) UpdateAccessToken(refreshToken string, newAccessToken string, time time.Time) (string, error) {
 	query := `UPDATE "Token" SET "access_token"=$1, token_expiration = $2  WHERE "refresh_token"=$3`
 
-	_, err := r.db.Exec(query, newAccessToken, time.Now().Add(15*time.Minute), refreshToken)
+	_, err := r.db.Exec(query, newAccessToken, time, refreshToken)
 	if err != nil {
 		logrus.Error("ошибка в обновлении токена: %w", err)
 		return "", err
@@ -54,6 +54,22 @@ func (r TokenRepository) RevokeToken(token string) error {
 	return nil
 }
 
+func (r TokenRepository) RefreshAllTokens(login, newAccessToken, newRefreshToken string, newAccessTokenExpiry, newRefreshTokenExpiry time.Time) error {
+	query := `
+		UPDATE "Token"
+		SET access_token = $1, refresh_token = $2, token_expiration = $3, refresh_token_expiration = $4
+		WHERE login = $5
+	`
+
+	_, err := r.db.Exec(query, newAccessToken, newRefreshToken, newAccessTokenExpiry, newRefreshTokenExpiry, login)
+	if err != nil {
+		logrus.Errorf("Ошибка обновления токенов для пользователя %s: %v", login, err)
+		return err
+	}
+
+	return nil
+}
+
 func (r TokenRepository) CheckCount(login string) int {
 	count := 0
 	query := `SELECT COUNT(*) FROM "Token" WHERE login = $1`
@@ -61,4 +77,18 @@ func (r TokenRepository) CheckCount(login string) int {
 	r.db.QueryRow(query, login).Scan(&count)
 
 	return count
+}
+
+func (r TokenRepository) GetTimeToken(login string) (*models.Token, error) {
+	output := models.Token{}
+
+	query := `SELECT "token_expiration","refresh_token_expiration" FROM "Token" WHERE login = $1`
+
+	err := r.db.Select(&output, query, login)
+	if err != nil {
+		logrus.Error("ошибка при получение времени жизни токенов")
+		return nil, err
+	}
+
+	return &output, nil
 }
