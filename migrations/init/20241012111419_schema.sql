@@ -21,8 +21,7 @@ CREATE TABLE "Token" (
     access_token TEXT NOT NULL UNIQUE,
     refresh_token TEXT NOT NULL UNIQUE,
     token_expiration timestamp,
-    refresh_token_expiration timestamp,
-    is_revoked bool default false
+    refresh_token_expiration timestamp
 ) ;
 
 ALTER TABLE "User"

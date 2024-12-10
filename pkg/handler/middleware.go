@@ -12,13 +12,6 @@ func (h Handler) TokenValidationMiddleware(c *gin.Context) {
 	token = strings.TrimPrefix(token, "Bearer ")
 
 	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "токен отсутствует"})
-		c.Abort()
-		return
-	}
-
-	isActive, err := h.usecase.IsTokenActive(token)
-	if err != utils.Success || !isActive {
 		refreshToken := c.GetHeader("Refresh-Token")
 
 		if refreshToken == "" {

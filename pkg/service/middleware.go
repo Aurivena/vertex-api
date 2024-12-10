@@ -11,7 +11,3 @@ type MiddlewareService struct {
 func NewMiddlewareService(repo repository.Middleware) *MiddlewareService {
 	return &MiddlewareService{repo: repo}
 }
-
-func (s MiddlewareService) IsTokenActive(token string) (bool, error) {
-	return s.repo.IsTokenActive(token)
-}

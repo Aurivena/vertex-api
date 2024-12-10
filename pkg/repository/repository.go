@@ -24,7 +24,7 @@ type Account interface {
 
 type Token interface {
 	SaveToken(login string, token models.Token) error
-	RevokeToken(token string) error
+	DeleteToken(token string) error
 	CheckCount(login string) int
 	UpdateAccessToken(refreshToken string, newAccessToken string, time time.Time) (string, error)
 	RefreshAllTokens(login, newAccessToken, newRefreshToken string, newAccessTokenExpiry, newRefreshTokenExpiry time.Time) error
@@ -32,7 +32,6 @@ type Token interface {
 }
 
 type Middleware interface {
-	IsTokenActive(token string) (bool, error)
 }
 
 type Repository struct {

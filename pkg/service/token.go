@@ -42,7 +42,7 @@ func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) 
 
 	count := s.repo.CheckCount(login)
 	if count > 5 {
-		s.repo.RevokeToken(accessToken)
+		s.repo.DeleteToken(accessToken)
 		return nil, fmt.Errorf("ошибка. токенов больше 5")
 	}
 
@@ -55,7 +55,7 @@ func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) 
 }
 
 func (s TokenService) Logout(token string) error {
-	err := s.repo.RevokeToken(token)
+	err := s.repo.DeleteToken(token)
 	if err != nil {
 		return err
 	}

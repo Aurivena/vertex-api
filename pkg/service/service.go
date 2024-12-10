@@ -25,7 +25,6 @@ type Token interface {
 }
 
 type Middleware interface {
-	IsTokenActive(token string) (bool, error)
 }
 
 type Service struct {
