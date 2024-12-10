@@ -3,4 +3,4 @@
 logs
 configs/config.local.json
 .env.local
-.docs
+docs
