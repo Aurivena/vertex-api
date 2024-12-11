@@ -42,7 +42,7 @@ IS_VERIFY_DEPENDENCIES=true
 
 ```
 
-### goose
+### goose (изменять в баш файлах)
 ```
 export GOOSE_DRIVER=postgres
 export GOOSE_DBSTRING=postgresql://логин:пароль@localhost:порт/название_бд?sslmode=disable
