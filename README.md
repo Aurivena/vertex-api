@@ -42,6 +42,12 @@ IS_VERIFY_DEPENDENCIES=true
 
 ```
 
+### goose
+```
+export GOOSE_DRIVER=postgres
+export GOOSE_DBSTRING=postgresql://логин:пароль@localhost:порт/название_бд?sslmode=disable
+```
+
 # Быстрый старт
 - Создаем .env
 - Создаем config.local.json
