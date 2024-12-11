@@ -12,36 +12,38 @@ func (h Handler) TokenValidationMiddleware(c *gin.Context) {
 	token = strings.TrimPrefix(token, "Bearer ")
 
 	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "токен отсутствует"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Требуется авторизация"})
 		c.Abort()
 		return
 	}
 
-	isActive, err := h.usecase.IsTokenActive(token)
-	if err != utils.Success || !isActive {
-		refreshToken := c.GetHeader("Refresh-Token")
-
-		if refreshToken == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Требуется авторизация"})
-			c.Abort()
-			return
-		}
-
-		outputUser, processStatus := h.usecase.GetUserByRefreshToken(refreshToken)
-		if processStatus != utils.Success {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": processStatus})
-			return
-		}
-
-		tokenNew, processStatus := h.usecase.UpdateAccessToken(refreshToken, outputUser.Login)
-		if processStatus != utils.Success {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": processStatus})
-			return
-		}
-		c.Request.Header.Set("Authorization", tokenNew)
-	} else {
-		c.Request.Header.Set("Authorization", token)
+	outputUser, processStatus := h.usecase.GetUserByAccessToken(token)
+	if processStatus != utils.Success {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": processStatus})
+		c.Abort()
+		return
 	}
+
+	isValid, processStatus := h.usecase.CheckValidUser(outputUser.Login)
+	if processStatus != utils.NoContent {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": processStatus})
+		c.Abort()
+		return
+	}
+
+	if !isValid {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": processStatus})
+		c.Abort()
+		return
+	}
+
+	tokenNew, processStatus := h.usecase.RefreshAllToken(outputUser.Login)
+	if processStatus != utils.NoContent {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": processStatus})
+		c.Abort()
+		return
+	}
+	c.Request.Header.Set("Authorization", tokenNew.AccessToken)
 
 	c.Next()
 }

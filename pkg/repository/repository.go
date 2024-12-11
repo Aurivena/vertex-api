@@ -19,20 +19,19 @@ type Account interface {
 	GetUserByEmail(email string) (*models.Account, error)
 	GetUserByLogin(login string) (*models.Account, error)
 	IsRegistered(input string) (bool, error)
-	GetUserByRefreshToken(refreshToken string) (*models.Account, error)
+	GetUserByAccessToken(accessToken string) (*models.Account, error)
 }
 
 type Token interface {
 	SaveToken(login string, token models.Token) error
-	RevokeToken(token string) error
-	CheckCount(login string) int
-	UpdateAccessToken(refreshToken string, newAccessToken string, time time.Time) (string, error)
-	RefreshAllTokens(login, newAccessToken, newRefreshToken string, newAccessTokenExpiry, newRefreshTokenExpiry time.Time) error
-	GetTimeToken(login string) (*models.Token, error)
+	DeleteToken(token string) error
+	CheckCount(login string) error
+	UpdateAccessToken(login string, newAccessToken string, time time.Time) error
+	UpdateRefreshToken(login string, newRefreshToken string, time time.Time) error
+	GetAllInfoToken(login string) (*models.Token, error)
 }
 
 type Middleware interface {
-	IsTokenActive(token string) (bool, error)
 }
 
 type Repository struct {
