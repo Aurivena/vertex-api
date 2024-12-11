@@ -25,7 +25,7 @@ type Account interface {
 type Token interface {
 	SaveToken(login string, token models.Token) error
 	DeleteToken(token string) error
-	CheckCount(login string) int
+	CheckCount(login string) error
 	UpdateAccessToken(login string, newAccessToken string, time time.Time) error
 	UpdateRefreshToken(login string, newRefreshToken string, time time.Time) error
 	GetAllInfoToken(login string) (*models.Token, error)

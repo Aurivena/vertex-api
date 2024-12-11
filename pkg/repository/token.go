@@ -16,14 +16,21 @@ func NewTokenRepository(db *sqlx.DB) *TokenRepository {
 }
 
 func (r TokenRepository) SaveToken(login string, token models.Token) error {
-
+	tx, err := r.db.Beginx()
+	defer tx.Rollback()
 	query := `INSERT INTO "Token"
 				("login","access_token","refresh_token","access_token_expiration","refresh_token_expiration") 
 				VALUES ($1,$2,$3,$4,$5) RETURNING "id"`
 
-	_, err := r.db.Exec(query, login, token.AccessToken, token.RefreshToken, token.AccessTokenExpires, token.RefreshTokenExpires)
+	_, err = tx.Exec(query, login, token.AccessToken, token.RefreshToken, token.AccessTokenExpires, token.RefreshTokenExpires)
 	if err != nil {
 		logrus.Errorf("ошибка сохранения токенов: %w", err)
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		logrus.Errorf("ошибка при коммите транзакции: %w", err)
 		return err
 	}
 
@@ -31,11 +38,19 @@ func (r TokenRepository) SaveToken(login string, token models.Token) error {
 }
 
 func (r TokenRepository) UpdateAccessToken(login string, newAccessToken string, time time.Time) error {
+	tx, err := r.db.Beginx()
+	defer tx.Rollback()
 	query := `UPDATE "Token" SET "access_token"=$1, access_token_expiration = $2  WHERE "login"=$3`
 
-	_, err := r.db.Exec(query, newAccessToken, time, login)
+	_, err = tx.Exec(query, newAccessToken, time, login)
 	if err != nil {
 		logrus.Errorf("ошибка в обновлении токена: %w", err)
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		logrus.Errorf("ошибка при коммите транзакции: %w", err)
 		return err
 	}
 
@@ -43,11 +58,19 @@ func (r TokenRepository) UpdateAccessToken(login string, newAccessToken string, 
 }
 
 func (r TokenRepository) UpdateRefreshToken(login string, newRefreshToken string, time time.Time) error {
+	tx, err := r.db.Beginx()
+	defer tx.Rollback()
 	query := `UPDATE "Token" SET "refresh_token"=$1, refresh_token_expiration = $2  WHERE "login"=$3`
 
-	_, err := r.db.Exec(query, newRefreshToken, time, login)
+	_, err = tx.Exec(query, newRefreshToken, time, login)
 	if err != nil {
 		logrus.Errorf("ошибка в обновлении токена: %w", err)
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		logrus.Errorf("ошибка при коммите транзакции: %w", err)
 		return err
 	}
 
@@ -65,13 +88,33 @@ func (r TokenRepository) DeleteToken(token string) error {
 	return nil
 }
 
-func (r TokenRepository) CheckCount(login string) int {
+func (r TokenRepository) CheckCount(login string) error {
 	count := 0
 	query := `SELECT COUNT(*) FROM "Token" WHERE login = $1`
 
-	r.db.QueryRow(query, login).Scan(&count)
+	err := r.db.QueryRow(query, login).Scan(&count)
+	if err != nil {
+		return err
+	}
 
-	return count
+	if count == 5 {
+		query = `DELETE FROM "Token"
+				 WHERE "id" = (
+				 	SELECT "id"
+				 	FROM "Token"
+				 	WHERE "login" = $1
+				 	ORDER BY "access_token_expiration"
+				 	LIMIT 1
+				 )
+				`
+		_, err = r.db.Exec(query, login)
+		if err != nil {
+			logrus.Errorf("ошибка удаления токена: %w", err)
+			return err
+		}
+	}
+
+	return err
 }
 
 func (r TokenRepository) GetAllInfoToken(login string) (*models.Token, error) {

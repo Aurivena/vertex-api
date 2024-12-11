@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 	"time"
 	"vertexUP/models"
 	"vertexUP/pkg/repository"
@@ -26,12 +27,20 @@ func NewTokenService(repo repository.Token, secret string) *TokenService {
 
 func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) {
 
+	err := s.repo.CheckCount(login)
+	if err != nil {
+		logrus.Errorf("Ошибка при проверке количества токенов для пользователя %s: %v", login, err)
+		return nil, err
+	}
+
 	accessToken, err := CreateJWTToken(login, s.secret, access_token_time)
 	if err != nil {
+		logrus.Errorf("Ошибка при генерации access токена для пользователя %s: %v", login, err)
 		return nil, fmt.Errorf("ошибка генерации access token: %w", err)
 	}
 	refreshToken, err := CreateJWTToken(login, s.secret, refresh_token_time)
 	if err != nil {
+		logrus.Errorf("Ошибка при генерации refresh токена для пользователя %s: %v", login, err)
 		return nil, fmt.Errorf("ошибка генерации refresh token: %w", err)
 	}
 	token := &models.Token{
@@ -39,12 +48,6 @@ func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) 
 		RefreshToken:        refreshToken,
 		AccessTokenExpires:  time.Now().UTC().Add(access_token_time),
 		RefreshTokenExpires: time.Now().UTC().Add(refresh_token_time),
-	}
-
-	count := s.repo.CheckCount(login)
-	if count > 5 {
-		s.repo.DeleteToken(accessToken)
-		return nil, fmt.Errorf("ошибка. токенов больше 5")
 	}
 
 	err = s.repo.SaveToken(login, *token)
