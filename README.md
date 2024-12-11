@@ -42,7 +42,29 @@ IS_VERIFY_DEPENDENCIES=true
 
 ```
 
-### goose (изменять в баш файлах)
+## Для работы bash файлов нужно
+### goose
+```
+go install github.com/pressly/goose/v3/cmd/goose@latest
+```
+
+### swagger
+```
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+
+### Если проблема со swagger
+```
+export PATH=$PATH:$(go env GOPATH)/bin
+source ~/.bashrc
+```
+### Для проверки swagger
+```
+swag --version
+```
+
+
+### goose (изменять в bash файлах)
 ```
 export GOOSE_DRIVER=postgres
 export GOOSE_DBSTRING=postgresql://логин:пароль@localhost:порт/название_бд?sslmode=disable
