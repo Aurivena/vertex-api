@@ -37,12 +37,12 @@ func (r TokenRepository) SaveToken(login string, token models.Token) error {
 	return nil
 }
 
-func (r TokenRepository) UpdateAccessToken(login string, newAccessToken string, time time.Time) error {
+func (r TokenRepository) UpdateAccessToken(oldAccessToken string, newAccessToken string, time time.Time) error {
 	tx, err := r.db.Beginx()
 	defer tx.Rollback()
-	query := `UPDATE "Token" SET "access_token"=$1, access_token_expiration = $2  WHERE "login"=$3`
+	query := `UPDATE "Token" SET "access_token"=$1, access_token_expiration = $2  WHERE "access_token"=$3`
 
-	_, err = tx.Exec(query, newAccessToken, time, login)
+	_, err = tx.Exec(query, newAccessToken, time, oldAccessToken)
 	if err != nil {
 		logrus.Errorf("ошибка в обновлении токена: %w", err)
 		return err
@@ -57,12 +57,12 @@ func (r TokenRepository) UpdateAccessToken(login string, newAccessToken string, 
 	return nil
 }
 
-func (r TokenRepository) UpdateRefreshToken(login string, newRefreshToken string, time time.Time) error {
+func (r TokenRepository) UpdateRefreshToken(oldRefreshToken string, newRefreshToken string, time time.Time) error {
 	tx, err := r.db.Beginx()
 	defer tx.Rollback()
-	query := `UPDATE "Token" SET "refresh_token"=$1, refresh_token_expiration = $2  WHERE "login"=$3`
+	query := `UPDATE "Token" SET "refresh_token"=$1, refresh_token_expiration = $2  WHERE "refresh_token"=$3`
 
-	_, err = tx.Exec(query, newRefreshToken, time, login)
+	_, err = tx.Exec(query, newRefreshToken, time, oldRefreshToken)
 	if err != nil {
 		logrus.Errorf("ошибка в обновлении токена: %w", err)
 		return err

@@ -95,7 +95,7 @@ func (s TokenService) RefreshAllToken(login string) (*models.Token, error) {
 		if err != nil {
 			return nil, fmt.Errorf("ошибка генерации access token: %w", err)
 		}
-		err = s.repo.UpdateAccessToken(login, newAccessToken, time.Now().Add(access_token_time))
+		err = s.repo.UpdateAccessToken(currentTokens.AccessToken, newAccessToken, time.Now().Add(access_token_time))
 		if err != nil {
 			return nil, fmt.Errorf("ошибка обновления access_token: %w", err)
 		}
@@ -110,7 +110,7 @@ func (s TokenService) RefreshAllToken(login string) (*models.Token, error) {
 		if err != nil {
 			return nil, fmt.Errorf("ошибка генерации refresh token: %w", err)
 		}
-		err = s.repo.UpdateRefreshToken(login, newRefreshToken, time.Now().Add(access_token_time))
+		err = s.repo.UpdateRefreshToken(currentTokens.RefreshToken, newRefreshToken, time.Now().Add(access_token_time))
 		if err != nil {
 			return nil, fmt.Errorf("ошибка обновления access_token: %w", err)
 		}
