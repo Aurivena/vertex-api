@@ -41,13 +41,13 @@ func (r *AuthPostgres) SignUp(input *models.SignUpInput, time time.Time) (*model
 		input.Login, input.Name, input.Email, input.Password, utils.User, time,
 	)
 	if err != nil {
-		logrus.Error(err.Error())
+		logrus.Errorf(err.Error())
 		return nil, err
 	}
 
 	err = r.db.Get(&output.Status, `SELECT name FROM "Status" WHERE id = $1`, utils.User)
 	if err != nil {
-		logrus.Error(err.Error())
+		logrus.Errorf(err.Error())
 		return nil, err
 	}
 

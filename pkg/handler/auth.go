@@ -86,17 +86,19 @@ func (h Handler) signIn(c *gin.Context) {
 // @Success      400 {object} string "BadRequest"
 // @Failure      401 {object} string "StatusUnauthorized"
 // @Failure      500 {object} string "InternalServerError"
-// @Router       /account/logout [post]
+// @Router       /account/logout [delete]
 func (h Handler) logout(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "токен отсутствует"})
+		c.Abort()
 		return
 	}
 
 	processStatus := h.usecase.Logout(token)
 	if processStatus != utils.NoContent {
 		c.JSON(http.StatusBadRequest, processStatus)
+		c.Abort()
 		return
 	}
 

@@ -18,51 +18,47 @@ func NewTokenRepository(db *sqlx.DB) *TokenRepository {
 func (r TokenRepository) SaveToken(login string, token models.Token) error {
 
 	query := `INSERT INTO "Token"
-				("login","access_token","refresh_token","token_expiration","refresh_token_expiration") 
+				("login","access_token","refresh_token","access_token_expiration","refresh_token_expiration") 
 				VALUES ($1,$2,$3,$4,$5) RETURNING "id"`
 
-	_, err := r.db.Exec(query, login, token.AccessToken, token.RefreshToken, token.AccessTokenExpiresAt, token.RefreshTokenExpiresAt)
+	_, err := r.db.Exec(query, login, token.AccessToken, token.RefreshToken, token.AccessTokenExpires, token.RefreshTokenExpires)
 	if err != nil {
-		logrus.Error("ошибка сохранения токенов: %w", err)
+		logrus.Errorf("ошибка сохранения токенов: %w", err)
 		return err
 	}
 
 	return nil
 }
 
-func (r TokenRepository) UpdateAccessToken(refreshToken string, newAccessToken string, time time.Time) (string, error) {
-	query := `UPDATE "Token" SET "access_token"=$1, token_expiration = $2  WHERE "refresh_token"=$3`
+func (r TokenRepository) UpdateAccessToken(login string, newAccessToken string, time time.Time) error {
+	query := `UPDATE "Token" SET "access_token"=$1, access_token_expiration = $2  WHERE "login"=$3`
 
-	_, err := r.db.Exec(query, newAccessToken, time, refreshToken)
+	_, err := r.db.Exec(query, newAccessToken, time, login)
 	if err != nil {
-		logrus.Error("ошибка в обновлении токена: %w", err)
-		return "", err
+		logrus.Errorf("ошибка в обновлении токена: %w", err)
+		return err
 	}
 
-	return newAccessToken, nil
+	return nil
+}
+
+func (r TokenRepository) UpdateRefreshToken(login string, newRefreshToken string, time time.Time) error {
+	query := `UPDATE "Token" SET "refresh_token"=$1, refresh_token_expiration = $2  WHERE "login"=$3`
+
+	_, err := r.db.Exec(query, newRefreshToken, time, login)
+	if err != nil {
+		logrus.Errorf("ошибка в обновлении токена: %w", err)
+		return err
+	}
+
+	return nil
 }
 
 func (r TokenRepository) DeleteToken(token string) error {
 	query := `DELETE FROM "Token" WHERE "access_token" = $1`
 	_, err := r.db.Exec(query, token)
 	if err != nil {
-		logrus.Error("ошибка удаления токена: %w", err)
-		return err
-	}
-
-	return nil
-}
-
-func (r TokenRepository) RefreshAllTokens(login, newAccessToken, newRefreshToken string, newAccessTokenExpiry, newRefreshTokenExpiry time.Time) error {
-	query := `
-		UPDATE "Token"
-		SET access_token = $1, refresh_token = $2, token_expiration = $3, refresh_token_expiration = $4
-		WHERE login = $5
-	`
-
-	_, err := r.db.Exec(query, newAccessToken, newRefreshToken, newAccessTokenExpiry, newRefreshTokenExpiry, login)
-	if err != nil {
-		logrus.Errorf("Ошибка обновления токенов для пользователя %s: %v", login, err)
+		logrus.Errorf("ошибка удаления токена: %w", err)
 		return err
 	}
 
@@ -78,14 +74,14 @@ func (r TokenRepository) CheckCount(login string) int {
 	return count
 }
 
-func (r TokenRepository) GetTimeToken(login string) (*models.Token, error) {
+func (r TokenRepository) GetAllInfoToken(login string) (*models.Token, error) {
 	output := models.Token{}
 
-	query := `SELECT "token_expiration","refresh_token_expiration" FROM "Token" WHERE login = $1`
+	query := `SELECT "access_token", "refresh_token", "access_token_expiration","refresh_token_expiration" FROM "Token" WHERE login = $1`
 
-	err := r.db.Select(&output, query, login)
+	err := r.db.Get(&output, query, login)
 	if err != nil {
-		logrus.Error("ошибка при получение времени жизни токенов")
+		logrus.Errorf("ошибка при получение инфомарции токенов")
 		return nil, err
 	}
 

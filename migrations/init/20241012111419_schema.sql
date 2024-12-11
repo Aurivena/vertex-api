@@ -20,7 +20,7 @@ CREATE TABLE "Token" (
     login varchar,
     access_token TEXT NOT NULL UNIQUE,
     refresh_token TEXT NOT NULL UNIQUE,
-    token_expiration timestamp,
+    access_token_expiration timestamp,
     refresh_token_expiration timestamp
 ) ;
 
