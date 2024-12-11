@@ -8,7 +8,7 @@ import (
 
 // @Summary      Зарегистрировать пользователя
 // @Description  Регистрирует пользователя в система и устанавливает ему jwt токен
-// @Tags         Account
+// @Tags         Аккаунт
 // @Accept       json
 // @Produce      json
 // @Param        models.SignUpInput body models.SignUpInput true "Входные данные"
@@ -43,7 +43,7 @@ func (h Handler) signUp(c *gin.Context) {
 
 // @Summary      Авторизовать в системе пользователя
 // @Description  Авторизует пользователя в системе и выдает ему новый jwt токен
-// @Tags         Account
+// @Tags         Аккаунт
 // @Accept       json
 // @Produce      json
 // @Param        models.SignInInput body models.SignInInput true "Входные данные"
@@ -78,7 +78,7 @@ func (h Handler) signIn(c *gin.Context) {
 
 // @Summary      Совершить выход из аккаунта
 // @Description  Выходит из аккаунта и удаляет jwt токен
-// @Tags         Account
+// @Tags         Аккаунт
 // @Accept       json
 // @Produce      json
 // @Success      204 {object} string "NoContent"
