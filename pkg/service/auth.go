@@ -6,7 +6,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
 	"time"
-	"vertexUP/clerr"
 	"vertexUP/models"
 	"vertexUP/pkg/repository"
 )
@@ -53,7 +52,7 @@ func (s AuthService) SignUp(input *models.SignUpInput) (*models.SignUpOutput, er
 	}
 
 	if !isEmail(input.Email) {
-		return nil, errors.Errorf("email %s is not valid", input.Email)
+		return nil, errors.Errorf("email %s не валиден", input.Email)
 	}
 
 	if err := validatePassword(input.Password); err != nil {
@@ -67,24 +66,24 @@ func (s AuthService) SignUp(input *models.SignUpInput) (*models.SignUpOutput, er
 
 func validateName(name string) error {
 	if name == "" {
-		logrus.Error("name is nil")
-		return errors.New("name is nil")
+		logrus.Error("имя пустое")
+		return errors.New("имя пустое")
 	}
 	return nil
 }
 
 func validateLogin(login string) error {
 	if login == "" {
-		logrus.Error("login is nil")
-		return errors.New("login is nil")
+		logrus.Error("логин пустой")
+		return errors.New("логин пустой")
 	}
 	return nil
 }
 
 func validatePassword(password string) error {
 	if len(password) < 8 {
-		logrus.Error("password must be at least 8 characters")
-		return errors.New(clerr.ErrorPasswordTooShort)
+		logrus.Error("у пароля длина меньше 8 символов")
+		return errors.New("у пароля длина меньше 8 символов")
 	}
 	return nil
 }

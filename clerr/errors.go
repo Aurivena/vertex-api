@@ -1,6 +1,10 @@
 package clerr
 
+import "github.com/pkg/errors"
+
 // Auth error
 const (
-	ErrorPasswordTooShort = "password must be at least 8 characters"
+	errorServer = "server error"
 )
+
+var ErrorServer = errors.New(errorServer)

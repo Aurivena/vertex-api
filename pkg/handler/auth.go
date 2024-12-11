@@ -2,9 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"vertexUP/models"
-	"vertexUP/pkg/utils"
+	"vertexUP/pkg/usecase"
 )
 
 // @Summary      Зарегистрировать пользователя
@@ -21,25 +20,25 @@ func (h Handler) signUp(c *gin.Context) {
 	var input *models.SignUpInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		h.sendResponseSuccess(c, nil, usecase.BadRequest)
 		return
 	}
 
 	output, processStatus := h.usecase.SignUp(input)
-	if processStatus != utils.Success {
-		c.JSON(http.StatusBadRequest, processStatus)
+	if processStatus != usecase.Success {
+		h.sendResponseSuccess(c, nil, processStatus)
 		return
 	}
 
 	token, processStatus := h.usecase.SetToken(output.Login)
-	if processStatus != utils.Success {
-		c.JSON(http.StatusBadRequest, processStatus)
+	if processStatus != usecase.Success {
+		h.sendResponseSuccess(c, nil, processStatus)
 		return
 	}
 
 	c.Header("Authorization", token)
 
-	c.JSON(http.StatusOK, output)
+	h.sendResponseSuccess(c, &output, processStatus)
 }
 
 // @Summary      Авторизовать в системе пользователя
@@ -56,25 +55,25 @@ func (h Handler) signUp(c *gin.Context) {
 func (h Handler) signIn(c *gin.Context) {
 	var input *models.SignInInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		h.sendResponseSuccess(c, nil, usecase.BadRequest)
 		return
 	}
 
 	output, processStatus := h.usecase.SignIn(input)
-	if processStatus != utils.Success {
-		c.JSON(http.StatusBadRequest, processStatus)
+	if processStatus != usecase.Success {
+		h.sendResponseSuccess(c, nil, processStatus)
 		return
 	}
 
 	token, processStatus := h.usecase.SetToken(output.Login)
-	if processStatus != utils.Success {
-		c.JSON(http.StatusBadRequest, processStatus)
+	if processStatus != usecase.Success {
+		h.sendResponseSuccess(c, nil, processStatus)
 		return
 	}
 
 	c.Header("Authorization", token)
 
-	c.JSON(http.StatusOK, output)
+	h.sendResponseSuccess(c, &output, processStatus)
 }
 
 // @Summary      Совершить выход из аккаунта
@@ -90,17 +89,15 @@ func (h Handler) signIn(c *gin.Context) {
 func (h Handler) logout(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "токен отсутствует"})
-		c.Abort()
+		h.sendResponseSuccess(c, nil, usecase.BadRequest)
 		return
 	}
 
 	processStatus := h.usecase.Logout(token)
-	if processStatus != utils.NoContent {
-		c.JSON(http.StatusBadRequest, processStatus)
-		c.Abort()
+	if processStatus != usecase.NoContent {
+		h.sendResponseSuccess(c, nil, processStatus)
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	h.sendResponseSuccess(c, nil, processStatus)
 }

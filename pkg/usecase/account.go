@@ -2,18 +2,17 @@ package usecase
 
 import (
 	"vertexUP/models"
-	"vertexUP/pkg/utils"
 )
 
 func (u Usecase) UpdatePassword(input *models.UpdatePasswordInput) error {
 	return nil
 }
 
-func (u Usecase) GetUserByAccessToken(refreshToken string) (*models.Account, utils.ErrorCode) {
+func (u Usecase) GetUserByAccessToken(refreshToken string) (*models.Account, ErrorCode) {
 	output, err := u.services.GetUserByAccessToken(refreshToken)
 	if err != nil {
-		return nil, utils.BadRequest
+		return nil, BadRequest
 	}
 
-	return output, utils.Success
+	return output, Success
 }

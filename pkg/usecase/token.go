@@ -2,31 +2,30 @@ package usecase
 
 import (
 	"vertexUP/models"
-	"vertexUP/pkg/utils"
 )
 
-func (u Usecase) SetToken(login string) (string, utils.ErrorCode) {
+func (u Usecase) SetToken(login string) (string, ErrorCode) {
 	token, err := u.services.GenerateTokenAndSave(login)
 	if err != nil {
-		return "", utils.BadRequest
+		return "", BadRequest
 	}
 
-	return token.AccessToken, utils.Success
+	return token.AccessToken, Success
 }
 
-func (u Usecase) RefreshAllToken(login string) (*models.Token, utils.ErrorCode) {
+func (u Usecase) RefreshAllToken(login string) (*models.Token, ErrorCode) {
 	output, err := u.services.RefreshAllToken(login)
 	if err != nil {
-		return nil, utils.BadRequest
+		return nil, BadRequest
 	}
-	return output, utils.NoContent
+	return output, NoContent
 }
 
-func (u Usecase) CheckValidUser(login string) (bool, utils.ErrorCode) {
+func (u Usecase) CheckValidUser(login string) (bool, ErrorCode) {
 	_, err := u.services.CheckValidUser(login)
 	if err != nil {
-		return false, utils.BadRequest
+		return false, BadRequest
 	}
 
-	return true, utils.NoContent
+	return true, NoContent
 }
