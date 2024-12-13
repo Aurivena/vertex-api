@@ -1,8 +1,11 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"strconv"
+	"strings"
 	"vertexUP/models"
 )
 
@@ -64,4 +67,68 @@ func (r AccountPostgres) IsRegistered(input string) (bool, error) {
 		return false, nil
 	}
 	return exists, nil
+}
+
+func (r AccountPostgres) UpdateInfoUser(info *models.UpdateInfoAccountInput, token string) (*models.UpdateInfoAccountOutput, error) {
+	tx, err := r.db.Beginx()
+	defer tx.Rollback()
+
+	query := `UPDATE "User" SET`
+	args := []interface{}{}
+	conditions := []string{}
+	count := 1
+
+	if info.Name != "" {
+		conditions = append(conditions, `"name" = $`+strconv.Itoa(count))
+		args = append(args, info.Name)
+		count++
+	}
+
+	if info.Login != "" {
+		conditions = append(conditions, `"login" = $`+strconv.Itoa(count))
+		args = append(args, info.Login)
+		count++
+	}
+
+	if info.Email != "" {
+		conditions = append(conditions, `"email"" = $`+strconv.Itoa(count))
+		args = append(args, info.Email)
+		count++
+	}
+
+	if info.Password != "" {
+		conditions = append(conditions, `"password"" = $`+strconv.Itoa(count))
+		args = append(args, info.Password)
+		count++
+	}
+
+	if len(conditions) == 0 {
+		return nil, fmt.Errorf("no data to update")
+	}
+
+	query += " " + strings.Join(conditions, ",") + `
+							FROM "Token"
+							WHERE "Token"."uuid" = "User"."uuid" WHERE "Token"."access_token" = $` + strconv.Itoa(count) + `)`
+
+	args = append(args, token)
+
+	_, err = tx.Exec(query, args...)
+	if err != nil {
+		logrus.Errorf("ошибка при обновлении данных %w: ", err)
+		return nil, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		logrus.Errorf("failed to commit transaction: %v", err)
+		return nil, err
+	}
+
+	output := &models.UpdateInfoAccountOutput{
+		Name:     info.Name,
+		Login:    info.Login,
+		Email:    info.Email,
+		Password: info.Password,
+	}
+
+	return output, nil
 }

@@ -28,3 +28,7 @@ func (s AccountService) GetUserByLogin(login string) (*models.Account, error) {
 func (s AccountService) GetUserByAccessToken(accessToken string) (*models.Account, error) {
 	return s.repo.GetUserByAccessToken(accessToken)
 }
+
+func (s AccountService) UpdateInfoAccount(info *models.UpdateInfoAccountInput, token string) (*models.UpdateInfoAccountOutput, error) {
+	return s.repo.UpdateInfoUser(info, token)
+}

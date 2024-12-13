@@ -49,6 +49,7 @@ func (h *Handler) InitHTTPRoutes(env *models.Environment) *gin.Engine {
 		account := api.Group("/account")
 		{
 			account.DELETE("/logout", h.logout)
+			account.PUT("", h.updateInfoAccount)
 		}
 	}
 

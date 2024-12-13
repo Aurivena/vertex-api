@@ -16,6 +16,7 @@ type Auth interface {
 }
 
 type Account interface {
+	UpdateInfoUser(info *models.UpdateInfoAccountInput, token string) (*models.UpdateInfoAccountOutput, error)
 	GetUserByEmail(email string) (*models.Account, error)
 	GetUserByLogin(login string) (*models.Account, error)
 	IsRegistered(input string) (bool, error)
