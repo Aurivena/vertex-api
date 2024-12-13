@@ -21,10 +21,10 @@ func (h Handler) updateInfoAccount(c *gin.Context) {
 		h.sendResponseSuccess(c, nil, usecase.BadRequest)
 	}
 
-	output, processStatus := h.usecase.UpdateInfoUser(&input, token)
+	processStatus := h.usecase.UpdateInfoUser(&input, token)
 	if processStatus != usecase.Success {
 		h.sendResponseSuccess(c, nil, processStatus)
 	}
 
-	h.sendResponseSuccess(c, output, processStatus)
+	h.sendResponseSuccess(c, nil, processStatus)
 }

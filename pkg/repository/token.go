@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -15,14 +16,14 @@ func NewTokenRepository(db *sqlx.DB) *TokenRepository {
 	return &TokenRepository{db: db}
 }
 
-func (r TokenRepository) SaveToken(login string, token models.Token) error {
+func (r TokenRepository) SaveToken(uuid uuid.UUID, token models.Token) error {
 	tx, err := r.db.Beginx()
 	defer tx.Rollback()
 	query := `INSERT INTO "Token"
-				("login","access_token","refresh_token","access_token_expiration","refresh_token_expiration") 
+				("user","access_token","refresh_token","access_token_expiration","refresh_token_expiration") 
 				VALUES ($1,$2,$3,$4,$5) RETURNING "id"`
 
-	_, err = tx.Exec(query, login, token.AccessToken, token.RefreshToken, token.AccessTokenExpires, token.RefreshTokenExpires)
+	_, err = tx.Exec(query, uuid, token.AccessToken, token.RefreshToken, token.AccessTokenExpires, token.RefreshTokenExpires)
 	if err != nil {
 		logrus.Errorf("ошибка сохранения токенов: %w", err)
 		return err
@@ -88,11 +89,11 @@ func (r TokenRepository) DeleteToken(token string) error {
 	return nil
 }
 
-func (r TokenRepository) CheckCount(login string) error {
+func (r TokenRepository) CheckCount(uuid uuid.UUID) error {
 	count := 0
-	query := `SELECT COUNT(*) FROM "Token" WHERE login = $1`
+	query := `SELECT COUNT(*) FROM "Token" WHERE "user" = $1`
 
-	err := r.db.QueryRow(query, login).Scan(&count)
+	err := r.db.QueryRow(query, uuid).Scan(&count)
 	if err != nil {
 		return err
 	}
@@ -102,12 +103,12 @@ func (r TokenRepository) CheckCount(login string) error {
 				 WHERE "id" = (
 				 	SELECT "id"
 				 	FROM "Token"
-				 	WHERE "login" = $1
+				 	WHERE "user" = $1
 				 	ORDER BY "access_token_expiration"
 				 	LIMIT 1
 				 )
 				`
-		_, err = r.db.Exec(query, login)
+		_, err = r.db.Exec(query, uuid)
 		if err != nil {
 			logrus.Errorf("ошибка удаления токена: %w", err)
 			return err
@@ -117,12 +118,12 @@ func (r TokenRepository) CheckCount(login string) error {
 	return err
 }
 
-func (r TokenRepository) GetAllInfoToken(login string) (*models.Token, error) {
+func (r TokenRepository) GetAllInfoToken(uuid uuid.UUID) (*models.Token, error) {
 	output := models.Token{}
 
-	query := `SELECT "access_token", "refresh_token", "access_token_expiration","refresh_token_expiration" FROM "Token" WHERE login = $1`
+	query := `SELECT "access_token", "refresh_token", "access_token_expiration","refresh_token_expiration" FROM "Token" WHERE "user" = $1`
 
-	err := r.db.Get(&output, query, login)
+	err := r.db.Get(&output, query, uuid)
 	if err != nil {
 		logrus.Errorf("ошибка при получение инфомарции токенов")
 		return nil, err

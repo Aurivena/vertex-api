@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	"vertexUP/models"
 	"vertexUP/pkg/repository"
 )
@@ -11,7 +12,7 @@ type Auth interface {
 }
 
 type Account interface {
-	UpdateInfoAccount(info *models.UpdateInfoAccountInput, token string) (*models.UpdateInfoAccountOutput, error)
+	UpdateInfoAccount(info *models.UpdateInfoAccountInput, token string) error
 	GetUserByEmail(email string) (*models.Account, error)
 	GetUserByLogin(login string) (*models.Account, error)
 	IsRegistered(input string) (bool, error)
@@ -19,10 +20,10 @@ type Account interface {
 }
 
 type Token interface {
-	GenerateTokenAndSave(login string) (*models.Token, error)
+	GenerateTokenAndSave(uuid uuid.UUID, login string) (*models.Token, error)
 	Logout(token string) error
-	RefreshAllToken(login string) (*models.Token, error)
-	CheckValidUser(login string) (bool, error)
+	RefreshAllToken(uuid uuid.UUID, login string) (*models.Token, error)
+	CheckValidUser(uuid uuid.UUID) (bool, error)
 }
 
 type Middleware interface {

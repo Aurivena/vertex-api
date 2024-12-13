@@ -45,7 +45,7 @@ func (r AccountPostgres) GetUserByAccessToken(accessToken string) (*models.Accou
 	output := models.Account{}
 
 	err := r.db.Get(&output, `SELECT name,email,status,"User".login FROM "User"
-									INNER JOIN "Token" on "Token".login = "User".login
+									INNER JOIN "Token" on "Token".user = "User".uuid
 									WHERE "Token".access_token = $1`, accessToken)
 	if err != nil {
 		logrus.Errorf(err.Error())
@@ -69,7 +69,7 @@ func (r AccountPostgres) IsRegistered(input string) (bool, error) {
 	return exists, nil
 }
 
-func (r AccountPostgres) UpdateInfoUser(info *models.UpdateInfoAccountInput, token string) (*models.UpdateInfoAccountOutput, error) {
+func (r AccountPostgres) UpdateInfoUser(info *models.UpdateInfoAccountInput, token string) error {
 	tx, err := r.db.Beginx()
 	defer tx.Rollback()
 
@@ -91,44 +91,37 @@ func (r AccountPostgres) UpdateInfoUser(info *models.UpdateInfoAccountInput, tok
 	}
 
 	if info.Email != "" {
-		conditions = append(conditions, `"email"" = $`+strconv.Itoa(count))
+		conditions = append(conditions, `"email" = $`+strconv.Itoa(count))
 		args = append(args, info.Email)
 		count++
 	}
 
 	if info.Password != "" {
-		conditions = append(conditions, `"password"" = $`+strconv.Itoa(count))
+		conditions = append(conditions, `"password" = $`+strconv.Itoa(count))
 		args = append(args, info.Password)
 		count++
 	}
 
 	if len(conditions) == 0 {
-		return nil, fmt.Errorf("no data to update")
+		return fmt.Errorf("no data to update")
 	}
 
 	query += " " + strings.Join(conditions, ",") + `
 							FROM "Token"
-							WHERE "Token"."uuid" = "User"."uuid" WHERE "Token"."access_token" = $` + strconv.Itoa(count) + `)`
+							WHERE "Token"."user" = "User"."uuid" AND "Token"."access_token" = $` + strconv.Itoa(count)
 
 	args = append(args, token)
 
 	_, err = tx.Exec(query, args...)
 	if err != nil {
 		logrus.Errorf("ошибка при обновлении данных %w: ", err)
-		return nil, err
+		return err
 	}
 
 	if err = tx.Commit(); err != nil {
 		logrus.Errorf("failed to commit transaction: %v", err)
-		return nil, err
+		return err
 	}
 
-	output := &models.UpdateInfoAccountOutput{
-		Name:     info.Name,
-		Login:    info.Login,
-		Email:    info.Email,
-		Password: info.Password,
-	}
-
-	return output, nil
+	return nil
 }

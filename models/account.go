@@ -19,7 +19,7 @@ type UpdateInfoAccountInput struct {
 	UUID     uuid.UUID `json:"uuid" db:"uuid"`
 	Name     string    `json:"name" db:"name"`
 	Login    string    `json:"login" db:"login"`
-	Password string    `json:"-"`
+	Password string    `json:"password"`
 	Email    string    `json:"email" db:"email"`
 }
 type UpdateInfoAccountOutput struct {

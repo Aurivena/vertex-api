@@ -26,9 +26,9 @@ func NewTokenService(repo repository.Token, secret string) *TokenService {
 	return &TokenService{repo: repo, secret: secret}
 }
 
-func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) {
+func (s TokenService) GenerateTokenAndSave(uuid uuid.UUID, login string) (*models.Token, error) {
 
-	err := s.repo.CheckCount(login)
+	err := s.repo.CheckCount(uuid)
 	if err != nil {
 		logrus.Errorf("Ошибка при проверке количества токенов для пользователя %s: %v", login, err)
 		return nil, err
@@ -51,7 +51,7 @@ func (s TokenService) GenerateTokenAndSave(login string) (*models.Token, error) 
 		RefreshTokenExpires: time.Now().UTC().Add(refresh_token_time),
 	}
 
-	err = s.repo.SaveToken(login, *token)
+	err = s.repo.SaveToken(uuid, *token)
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +67,8 @@ func (s TokenService) Logout(token string) error {
 	return nil
 }
 
-func (s TokenService) CheckValidUser(login string) (bool, error) {
-	output, err := s.repo.GetAllInfoToken(login)
+func (s TokenService) CheckValidUser(uuid uuid.UUID) (bool, error) {
+	output, err := s.repo.GetAllInfoToken(uuid)
 	if err != nil {
 		return false, err
 	}
@@ -83,8 +83,8 @@ func (s TokenService) CheckValidUser(login string) (bool, error) {
 
 }
 
-func (s TokenService) RefreshAllToken(login string) (*models.Token, error) {
-	currentTokens, err := s.repo.GetAllInfoToken(login)
+func (s TokenService) RefreshAllToken(uuid uuid.UUID, login string) (*models.Token, error) {
+	currentTokens, err := s.repo.GetAllInfoToken(uuid)
 	if err != nil {
 		return nil, fmt.Errorf("не удалось получить текущие токены: %w", err)
 	}

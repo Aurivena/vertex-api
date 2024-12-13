@@ -7,7 +7,7 @@ CREATE TABLE "User"(
     email varchar UNIQUE ,
     password varchar,
     status int,
-    date_registration timestamp,
+    date_registration timestamp
 );
 
 CREATE TABLE "Status"(
@@ -17,7 +17,7 @@ CREATE TABLE "Status"(
 
 CREATE TABLE "Token" (
     id serial PRIMARY KEY ,
-    user UUID,
+    "user" UUID,
     access_token TEXT NOT NULL UNIQUE,
     refresh_token TEXT NOT NULL UNIQUE,
     access_token_expiration timestamp,
@@ -28,7 +28,7 @@ ALTER TABLE "User"
     ADD CONSTRAINT "fk_User_0" FOREIGN KEY ("status") REFERENCES "Status" ("id");
 
 ALTER TABLE "Token"
-    ADD CONSTRAINT "fk_Token_0" FOREIGN KEY ("user")  REFERENCES "User" ("id") ON DELETE CASCADE;
+    ADD CONSTRAINT "fk_Token_0" FOREIGN KEY ("user")  REFERENCES "User" ("uuid");
 -- +goose StatementEnd
 
 -- +goose Down

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"time"
 	"vertexUP/models"
@@ -16,7 +17,7 @@ type Auth interface {
 }
 
 type Account interface {
-	UpdateInfoUser(info *models.UpdateInfoAccountInput, token string) (*models.UpdateInfoAccountOutput, error)
+	UpdateInfoUser(info *models.UpdateInfoAccountInput, token string) error
 	GetUserByEmail(email string) (*models.Account, error)
 	GetUserByLogin(login string) (*models.Account, error)
 	IsRegistered(input string) (bool, error)
@@ -24,12 +25,12 @@ type Account interface {
 }
 
 type Token interface {
-	SaveToken(login string, token models.Token) error
+	SaveToken(uuid uuid.UUID, token models.Token) error
 	DeleteToken(token string) error
-	CheckCount(login string) error
+	CheckCount(uuid uuid.UUID) error
 	UpdateAccessToken(oldAccessToken string, newAccessToken string, time time.Time) error
 	UpdateRefreshToken(oldRefreshToken string, newRefreshToken string, time time.Time) error
-	GetAllInfoToken(login string) (*models.Token, error)
+	GetAllInfoToken(uuid uuid.UUID) (*models.Token, error)
 }
 
 type Middleware interface {

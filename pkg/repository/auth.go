@@ -34,11 +34,16 @@ func (r *AuthPostgres) SignIn(input *models.SignInInput) (*models.SignInOutput, 
 func (r *AuthPostgres) SignUp(input *models.SignUpInput, time time.Time) (*models.SignUpOutput, error) {
 	var output models.SignUpOutput
 
-	err := r.db.Get(&output, `
-    INSERT INTO "User" ("login", "name", "email", "password", "status","date_registration")
-    VALUES ($1, $2, $3, $4, $5, $6)
+	uuid, err := utils.GenerateUUID()
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.db.Get(&output, `
+    INSERT INTO "User" ("uuid","login", "name", "email", "password", "status","date_registration")
+    VALUES ($1, $2, $3, $4, $5, $6,$7)
     RETURNING "name","login","email","date_registration"`,
-		input.Login, input.Name, input.Email, input.Password, utils.User, time,
+		uuid, input.Login, input.Name, input.Email, input.Password, utils.User, time,
 	)
 	if err != nil {
 		logrus.Errorf(err.Error())

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"vertexUP/models"
 	"vertexUP/pkg/repository"
 )
@@ -29,6 +31,21 @@ func (s AccountService) GetUserByAccessToken(accessToken string) (*models.Accoun
 	return s.repo.GetUserByAccessToken(accessToken)
 }
 
-func (s AccountService) UpdateInfoAccount(info *models.UpdateInfoAccountInput, token string) (*models.UpdateInfoAccountOutput, error) {
+func (s AccountService) UpdateInfoAccount(info *models.UpdateInfoAccountInput, token string) error {
+	if info.Email != "" {
+		exists := isEmail(info.Email)
+		if !exists {
+			logrus.Error("введите корректный email!")
+			return errors.New("введите корректный email!")
+		}
+	}
+	if info.Password != "" {
+		err := validatePassword(info.Password)
+		if err != nil {
+			return err
+		}
+		info.Password = bcryptHash(info.Password)
+	}
+
 	return s.repo.UpdateInfoUser(info, token)
 }
