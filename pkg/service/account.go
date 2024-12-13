@@ -32,6 +32,21 @@ func (s AccountService) GetUserByAccessToken(accessToken string) (*models.Accoun
 }
 
 func (s AccountService) UpdateInfoAccount(info *models.UpdateInfoAccountInput, token string) error {
+
+	if info.Name != "" {
+		err := validateName(info.Name)
+		if err != nil {
+			return err
+		}
+	}
+
+	if info.Login != "" {
+		err := validateLogin(info.Login)
+		if err != nil {
+			return err
+		}
+	}
+
 	if info.Email != "" {
 		exists := isEmail(info.Email)
 		if !exists {
